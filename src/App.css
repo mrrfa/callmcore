@@ -449,3 +449,94 @@
   border-top: 1px solid #eee;
   padding-top: 1rem;
 }
+
+/* Recommendation List Styles */
+.recommendation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  perspective: 1000px;
+}
+
+.recommendation-option-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(15px);
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  text-align: left;
+}
+
+.recommendation-option-card:hover {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: #89A894;
+  box-shadow: 0 8px 25px rgba(137, 168, 148, 0.2);
+}
+
+.option-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #6B8F7F;
+}
+
+.option-difficulty {
+  background: rgba(137, 168, 148, 0.2);
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.option-title {
+  margin: 0 0 5px 0;
+  font-size: 1.3rem;
+  color: #2F4F4F;
+  font-weight: 700;
+}
+
+.option-desc {
+  margin: 0 0 15px 0;
+  font-size: 0.95rem;
+  color: #555;
+  line-height: 1.4;
+}
+
+.option-timings {
+  display: flex;
+  gap: 15px;
+  font-size: 0.85rem;
+  color: #6B8F7F;
+  font-weight: 600;
+}
+
+.option-timings span {
+  background: rgba(255, 255, 255, 0.5);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+/* Back Link */
+.back-to-list-link {
+  background: none;
+  border: none;
+  color: #6B8F7F;
+  text-decoration: underline;
+  cursor: pointer;
+  margin-top: 15px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.back-to-list-link:hover {
+  color: #4A6B5D;
+}

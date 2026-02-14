@@ -12,49 +12,58 @@ if (API_KEY) {
 export const getBreathingRecommendation = async (mood, intensity, context) => {
     if (!genAI) {
         console.error("Gemini API not initialized");
-        return {
+        return [{
+            id: "missing_key",
             title: "Calming Breath",
             description: "A simple breathing pattern to help you center yourself. (API Key Missing)",
+            difficulty: "Easy",
             timings: { inhale: 4, hold: 4, exhale: 4 },
             instruction: "Breathe gently."
-        };
+        }];
     }
 
     try {
         const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
 
         const prompt = `
-            Act as an expert breathwork coach. Create a personalized breathing exercise based on the following user state:
+            Act as an expert breathwork coach. Create 3 DISTINCT personalized breathing exercises based on the following user state:
             - Mood: "${mood?.label || 'Neutral'}"
             - Intensity: "${intensity?.label || 'Medium'}"
-            - Context/Specific Situation: "${context || 'None'}"
+            - Context/Specific Situation: "${context || 'None (General Wellness)'}"
 
-            **CRITICAL RULES FOR CHRONIC CONDITIONS:**
+            **PERSONALIZATION RULES:**
+            - **Option 1: Quick Fix (Short & Effective):** Something easy to do immediately (e.g., Physiological Sigh).
+            - **Option 2: Balanced (Medium Duration):** A standard technique for the mood (e.g., Box Breathing).
+            - **Option 3: Deep Dive (Longer/Immersive):** A more involved technique (e.g., 4-7-8 or specific pranayama).
+
+            **IMPORTANT:** If 'Context' is 'None' or empty, you **MUST** use the 'Mood' and 'Intensity' values to determine the speed and style of the breathing.
+            - High Intensity -> Slower, grounding breaths.
+            - Low Intensity -> Gentle, rhythmic breaths.
+            - Anxious Mood -> Longer exhales.
+            - Low Energy Mood -> Energizing inhales.
+
+            **CRITICAL RULES FOR CHRONIC CONDITIONS (Apply to ALL):**
             - If Context includes "Asthma", "Tight Breathing", "COPD", or "Panic":
               - **NO BREATH HOLDS** (hold = 0).
               - Focus on slow nasal inhaling and long exhales.
             - If Context includes "Anxiety" or "Panic":
               - Exhale must be longer than Inhale (e.g., 4-0-6 or 4-0-8).
 
-            **SPECIFIC SCENARIOS:**
-            - "Presentation Soon" + "Anxiety": Suggest "Box Breathing" or "Physiological Sigh".
-            - "Post Workout": Suggest "Coherent Breathing" with long exhales to recover.
-            - "Focus": Suggest "Balanced Breathing" (e.g., 4-0-4 or 4-4-4-4).
-            
             **OUTPUT FORMAT:**
-            Return ONLY a valid JSON object. Do not include markdown formatting like \`\`\`json.
-            {
-                "title": "Name of the technique",
-                "description": "Why this helps to the specific context (max 2 sentences).",
-                "timings": {
-                    "inhale": number (seconds),
-                    "hold": number (seconds),
-                    "exhale": number (seconds)
+            Return ONLY a valid JSON Array containing 3 objects. Do not include markdown formatting.
+            [
+                {
+                    "id": "option_1",
+                    "title": "Name of technique",
+                    "description": "Why this specific one? (1 sentence)",
+                    "difficulty": "Easy" | "Medium" | "Advanced",
+                    "timings": { "inhale": 4, "hold": 4, "exhale": 4 },
+                    "instruction": "Guidance phrase",
+                    "warning": "Optional safety note",
+                    "sequence_advice": "e.g., '10 reps'"
                 },
-                "instruction": "Short guidance phrase (e.g., 'Inhale confidence, exhale doubt').",
-                "warning": "Optional safety note if applicable (e.g., 'Do not hold breath if lightheaded').",
-                "sequence_advice": "Optional note on how many rounds to do (e.g., 'Do 3 rounds then return to normal breathing')."
-            }
+                ... (2 more)
+            ]
         `;
 
         const result = await model.generateContent(prompt);
@@ -72,11 +81,34 @@ export const getBreathingRecommendation = async (mood, intensity, context) => {
 
     } catch (error) {
         console.error("Error generating breathing recommendation:", error);
-        return {
-            title: "Box Breathing",
-            description: "Focus on the square flow of breath to reset your nervous system.",
-            timings: { inhale: 4, hold: 4, exhale: 4 },
-            instruction: "Find your rhythm."
-        };
+        return [
+            {
+                id: "fallback_1",
+                title: "Box Breathing",
+                description: "Classic technique to reset focus and calm nerves.",
+                difficulty: "Medium",
+                timings: { inhale: 4, hold: 4, exhale: 4 },
+                instruction: "Find your square.",
+                sequence_advice: "4 rounds"
+            },
+            {
+                id: "fallback_2",
+                title: "Physiological Sigh",
+                description: "Double inhale, long exhale to quickly offload CO2.",
+                difficulty: "Easy",
+                timings: { inhale: 2, hold: 0, exhale: 6 },
+                instruction: "Double inhale... release.",
+                sequence_advice: "5 times"
+            },
+            {
+                id: "fallback_3",
+                title: "4-7-8 Relax",
+                description: "Deep relaxation technique for sleep or calm.",
+                difficulty: "Advanced",
+                timings: { inhale: 4, hold: 7, exhale: 8 },
+                instruction: "Soothe the system.",
+                sequence_advice: "4 cycles"
+            }
+        ];
     }
 };

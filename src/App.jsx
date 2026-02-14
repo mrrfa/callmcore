@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import './App.css';
 import MoodSelector from './components/MoodSelector';
-import IntensitySelector from './components/IntensitySelector';
+import IntensitySelector, { intensities } from './components/IntensitySelector';
 import RecommendationScreen from './components/RecommendationScreen';
 import ContextScreen from './components/ContextScreen';
 
@@ -16,7 +16,8 @@ function App() {
     setCurrentScreen('intensity');
   };
 
-  const handleIntensitySelect = (intensity) => {
+  const handleIntensitySelect = (intensityId) => {
+    const intensity = intensities.find(i => i.id === intensityId);
     setSelectedIntensity(intensity);
     setCurrentScreen('context');
   };
@@ -49,7 +50,7 @@ function App() {
       {currentScreen === 'intensity' && (
         <IntensitySelector
           onSelect={handleIntensitySelect}
-          selectedIntensity={selectedIntensity}
+          selectedIntensity={selectedIntensity?.id}
         />
       )}
       {currentScreen === 'context' && (

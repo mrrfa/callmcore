@@ -63,45 +63,50 @@ const Flower = ({ phase, timings }) => {
 const RecommendationScreen = ({ onReset, mood, intensity, context }) => {
     const [phase, setPhase] = useState('exhale');
     const [instruction, setInstruction] = useState('Preparing...');
-    const [data, setData] = useState(null);
+    const [options, setOptions] = useState(null); // Array of 3 options
+    const [selectedOption, setSelectedOption] = useState(null); // The chosen one
     const [loading, setLoading] = useState(true);
 
+    // Fetch Options (Only once)
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
-            setInstruction("Generating your personal breathing guide...");
-            const result = await getBreathingRecommendation(mood, intensity, context);
-            setData(result);
+            setInstruction("Crafting your personalized sessions...");
+            try {
+                const results = await getBreathingRecommendation(mood, intensity, context);
+                // Ensure it's an array (handle potential single object legacy returns just in case)
+                setOptions(Array.isArray(results) ? results : [results]);
+            } catch (err) {
+                console.error("Failed to load recommendations", err);
+                setOptions([]);
+            }
             setLoading(false);
         };
 
         fetchData();
     }, [mood, intensity, context]);
 
+    // Breathing Cycle Logic (Only runs when selectedOption is set)
     useEffect(() => {
-        if (!data) return;
+        if (!selectedOption) return;
 
-        const { inhale, hold, exhale } = data.timings;
+        const { inhale, hold, exhale } = selectedOption.timings;
         const totalCycle = (inhale + hold + exhale) * 1000;
 
         const runCycle = () => {
-            // Step 1: Inhale -> Close 
             setPhase('inhale');
             setInstruction('Inhale (Close)...');
 
             setTimeout(() => {
-                // Step 2: Hold -> Stay Closed
                 const hasHold = hold > 0;
                 if (hasHold) {
                     setPhase('hold');
                     setInstruction('Hold...');
                 }
 
-                // Calculate delay for next step
                 const nextStepDelay = hasHold ? hold * 1000 : 0;
 
                 setTimeout(() => {
-                    // Step 3: Exhale -> Bloom
                     setPhase('exhale');
                     setInstruction('Exhale (Bloom)...');
                 }, nextStepDelay);
@@ -109,20 +114,28 @@ const RecommendationScreen = ({ onReset, mood, intensity, context }) => {
             }, inhale * 1000);
         };
 
-        // Initial run
         runCycle();
-
-        // Loop
         const interval = setInterval(runCycle, totalCycle);
-
         return () => clearInterval(interval);
-    }, [data]);
+    }, [selectedOption]);
+
+    const handleSelectOption = (option) => {
+        setSelectedOption(option);
+    };
+
+    const handleBackToList = () => {
+        setSelectedOption(null);
+        setPhase('exhale'); // Reset visual
+    };
 
     return (
         <div className="recommendation-container">
-            <h1 className="title recommendations-title">RECOMMENDATIONS</h1>
+            <h1 className="title recommendations-title">
+                {selectedOption ? "BREATHE" : "CHOOSE YOUR FLOW"}
+            </h1>
             <h2 className="subtitle recommendations-subtitle">
-                {loading ? "Connecting to nature..." : "Based on your mood"}
+                {loading ? "Connecting to nature..." :
+                    selectedOption ? selectedOption.title : "We found 3 ways to help you."}
             </h2>
 
             <AnimatePresence mode="wait">
@@ -146,27 +159,59 @@ const RecommendationScreen = ({ onReset, mood, intensity, context }) => {
                         </div>
                         <p className="loading-text">Crafting your session...</p>
                     </motion.div>
-                ) : (
+                ) : !selectedOption ? (
+                    /* LIST VIEW */
                     <motion.div
-                        key="content"
+                        key="list"
+                        className="recommendation-list"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                    >
+                        {options?.map((option, index) => (
+                            <motion.div
+                                key={index}
+                                className="recommendation-option-card"
+                                onClick={() => handleSelectOption(option)}
+                                whileHover={{ scale: 1.02, y: -2 }}
+                                whileTap={{ scale: 0.98 }}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: index * 0.1 }}
+                            >
+                                <div className="option-header">
+                                    <span className="option-difficulty">{option.difficulty || "Medium"}</span>
+                                    {option.sequence_advice && <span className="option-duration">{option.sequence_advice}</span>}
+                                </div>
+                                <h3 className="option-title">{option.title}</h3>
+                                <p className="option-desc">{option.description}</p>
+                                <div className="option-timings">
+                                    <span>In: {option.timings.inhale}s</span>
+                                    <span>Hold: {option.timings.hold}s</span>
+                                    <span>Out: {option.timings.exhale}s</span>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </motion.div>
+                ) : (
+                    /* ACTIVE BREATHING VIEW */
+                    <motion.div
+                        key="active"
                         className="recommendation-card"
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.8 }}
+                        transition={{ duration: 0.5 }}
                     >
                         <div className="card-content">
-                            <h3 className="card-title">{data.title}</h3>
-                            <p className="card-description">{data.description}</p>
-
-                            {/* Warnings / Advice */}
-                            {data.warning && (
+                            {/* Warnings */}
+                            {selectedOption.warning && (
                                 <div className="warning-box">
-                                    ⚠️ {data.warning}
+                                    ⚠️ {selectedOption.warning}
                                 </div>
                             )}
 
                             <div className="breathing-visual">
-                                <Flower phase={phase} timings={data.timings} />
+                                <Flower phase={phase} timings={selectedOption.timings} />
                                 <motion.p
                                     key={instruction}
                                     initial={{ opacity: 0 }}
@@ -176,20 +221,21 @@ const RecommendationScreen = ({ onReset, mood, intensity, context }) => {
                                     {instruction}
                                 </motion.p>
                             </div>
-                            <p className="card-footer-text">{data.instruction}</p>
-                            {data.sequence_advice && (
-                                <p className="sequence-advice">
-                                    {data.sequence_advice}
-                                </p>
-                            )}
+                            <p className="card-footer-text">{selectedOption.instruction}</p>
+
+                            <button className="back-to-list-link" onClick={handleBackToList}>
+                                Choose a different technique
+                            </button>
                         </div>
                     </motion.div>
                 )}
             </AnimatePresence>
 
-            <button className="reset-button" onClick={onReset}>
-                Start Over
-            </button>
+            {!loading && (
+                <button className="reset-button" onClick={onReset}>
+                    Start Over
+                </button>
+            )}
         </div>
     );
 };

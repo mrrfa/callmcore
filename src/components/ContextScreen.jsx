@@ -46,7 +46,7 @@ const ContextScreen = ({ onContinue, onBack }) => {
             <div className="navigation-buttons">
                 <button className="nav-button back" onClick={onBack}>Back</button>
                 <button className="nav-button continue" onClick={handleContinue}>
-                    {context ? "Personalize Session" : "Skip"}
+                    Personalize Session
                 </button>
             </div>
         </div>

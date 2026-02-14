@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import '../App.css';
 
-const intensities = [
+export const intensities = [
     { id: 1, label: 'Gentle', height: '80px', color: '#B0C4B1', delay: 0 },
     { id: 2, label: 'Steady', height: '120px', color: '#89A894', delay: 0.2 },
     { id: 3, label: 'Intense', height: '160px', color: '#6B8F7F', delay: 0.4 },

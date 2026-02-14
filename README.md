@@ -3,6 +3,7 @@
 # Callmcore 🎯
 
 ## Basic Details
+<<<<<<< Updated upstream
 **Team Name:** MIRFA&SHYAMA
 
 **Team Members:**
@@ -10,6 +11,16 @@
 - Shyama - MUHAMMED ABDURAHIMAN MEMORIAL ORPHANAGE (MAMO) COLLEGE
 
 **Hosted Project Link:** https://callmcore-s4de.vercel.app/
+=======
+**Team Name:** [INSERT TEAM NAME]
+
+**Team Members:**
+- [Member 1 Name] - [Member 1 College]
+- [Member 2 Name] - [Member 2 College]
+- [Member 3 Name] - [Member 3 College]
+
+**Hosted Project Link:** [INSERT HOSTED LINK HERE]
+>>>>>>> Stashed changes
 
 **Project Description:**
 Callmcore is a personalized breathing and mindfulness application that uses AI to generate tailored breathing exercises based on the user's mood, intensity of feeling, and specific context.
@@ -53,7 +64,15 @@ npm run dev
 
 ## Project Documentation
 
+<<<<<<< Updated upstream
 
+=======
+### Screenshots
+| Landing Page | Mood Selection | Recommendation Screen |
+|:---:|:---:|:---:|
+| ![Landing Page](path/to/screenshot1.png) | ![Mood Selection](path/to/screenshot2.png) | ![Recommendation](path/to/screenshot3.png) |
+*(Add your screenshots in an `img` folder and update paths)*
+>>>>>>> Stashed changes
 
 ### Diagrams
 **System Architecture:**
@@ -68,7 +87,11 @@ User Input (Mood/Intensity/Context) -> React Frontend -> Gemini API -> Processed
 6. App displays the custom breathing exercise.
 
 ## Project Demo
+<<<<<<< Updated upstream
 **Video:** https://drive.google.com/file/d/10xGt_K0mWALazPeeIBxyccxEFCyjGsyo/view?usp=drive_link
+=======
+**Video:** [INSERT DEMO VIDEO LINK HERE]
+>>>>>>> Stashed changes
 
 ## AI Tools Used
 **Tool:** Cursor
@@ -84,6 +107,16 @@ User Input (Mood/Intensity/Context) -> React Frontend -> Gemini API -> Processed
 
 ---
 
+<<<<<<< Updated upstream
+=======
+## Team Contributions
+- [Member 1]: Frontend development and UI design.
+- [Member 2]: AI integration and prompt engineering for Gemini.
+- [Member 3]: Project documentation and testing.
+
+---
+
+>>>>>>> Stashed changes
 ## License
 This project is licensed under the MIT License.
 
